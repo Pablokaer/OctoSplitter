@@ -43,7 +43,8 @@ from typing import Callable, Iterable, Iterator
 from . import APP_NAME, __version__
 from .i18n import tr
 
-REPO = "Pablokaer/StemSplitter"
+# renamed from Pablokaer/StemSplitter: apps up to 1.2.1 still ask for the old name and GitHub redirects them
+REPO = "Pablokaer/OctoSplitter"
 RELEASES_PAGE = f"https://github.com/{REPO}/releases/latest"
 # STEMSPLITTER_UPDATE_API points the check at another server (tests use a local one)
 API_LATEST = os.environ.get("STEMSPLITTER_UPDATE_API") or f"https://api.github.com/repos/{REPO}/releases/latest"

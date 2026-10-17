@@ -1,6 +1,6 @@
-# StemSplitter
+# OctoSplitter (formerly StemSplitter)
 
-Desktop app (Windows/macOS) that splits songs into stems with RoFormer models. The full technical reference is `docs/DOCUMENTATION.md`; the quick start for users is `README.md`.
+Desktop app (Windows/macOS) that splits songs into stems with RoFormer models. The repository is `Pablokaer/OctoSplitter`; internal identifiers (the `stemsplitter` package, `APP_NAME`, file and folder names) keep the old name on purpose, see `docs/DOCUMENTATION.md`. The full technical reference is `docs/DOCUMENTATION.md`; the quick start for users is `README.md`.
 
 ## Rule: everything is written in English
 
