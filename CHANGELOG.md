@@ -12,6 +12,9 @@ The technical history (commits, measurements) is in [section 9 of the documentat
 
 ## Unreleased
 
+- The update pop-up now says exactly what each new version adds or changes, in plain words, instead of a list of technical changes.
+- Nothing else in the app changed.
+
 ## 1.2.2 (2026-10-17)
 
 - The project moved to https://github.com/Pablokaer/OctoSplitter. The old address still leads there.
