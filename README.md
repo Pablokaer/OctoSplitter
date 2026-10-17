@@ -2,9 +2,7 @@
 
 > OctoSplitter was called StemSplitter until this version. Only the name shown in the app and its look changed: the download file names (`StemSplitter-…`), the install folder and the settings keep the old name, so existing installs update normally.
 
-![OctoSplitter: drop a song, get its stems](docs/images/interface.png)
-
-> *The picture above is a design illustration, not a screenshot. The real screens are in the next section.*
+![OctoSplitter after splitting a song: the Extracted Stems card plays the original and each stem on its own channel](docs/images/screen-4-after.png)
 
 > Full technical documentation: features, quality measurements, performance and optimizations, architecture, build and CI. See [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md).
 
@@ -22,35 +20,13 @@ A desktop app for **Windows and macOS** that takes a song (MP3, WAV, FLAC, M4A, 
 
 You tick which of these to write, from a single one (for example only **No Drums**, to play drums along) up to all eight. The default is Vocals, Drums, Bass and Other.
 
-## Screenshots: before and after splitting a song
-
-These are real screenshots of OctoSplitter 1.2.0, taken while splitting a 30-second clip of an MP3 with the *Fast* preset and the default stems (Vocals, Drums, Bass, Other).
-
-**1. Before: nothing added yet.** The **Split** page opens with the drop area, an empty queue and the *Output Settings* below. Drop songs or folders on it, or click **Add Files** / **Add Folder**.
-
-![The Split page when the app opens: drop area, empty queue](docs/images/screen-1-empty.png)
-
-**2. Before: the song is in the queue.** The song is listed as *Queued*. The bottom card says *Ready to split* and summarizes what will be written ("1 song to split · 4 files per song · Fast · MP3 · 320 kbps"). Click **Split Stems**.
-
-![A song queued, ready to be split](docs/images/screen-2-before.png)
-
-**3. During: splitting.** The song shows its progress and the time left, the bottom card has a **Cancel** button, and the status bar shows the device in use and the memory.
-
-![The song being split, with the progress and the Cancel button](docs/images/screen-3-processing.png)
-
-**4. After: the stems are ready.** The song is marked *Completed* with the time it took, and the **Extracted Stems** card shows the original and one channel per stem, each with its waveform, play, **M** (mute), **S** (solo) and volume. **Play stems** plays them together, and **Open output folder** shows the files, one subfolder per song.
-
-![The finished song: Extracted Stems with Vocals, Drums, Bass and Other](docs/images/screen-4-after.png)
-
-> These screenshots were taken on a Windows 11 PC **without using the GPU** (CPU only, 12 threads, which is why the status bar says "no GPU found - this will be slow"). The 30-second clip took 2 min 07 s in that run. That is a single run on a PC that was short on free memory, not a benchmark: see [How long does it take?](#how-long-does-it-take-4-minute-song) for the measured timings. With an NVIDIA GPU it is much faster.
-
 ## Features
 
 * **State-of-the-art separation**: RoFormer models, measured on MUSDB18 (see below). Three presets: *Balanced*, *Maximum* and *Fast*.
 * **Uses your GPU automatically**: NVIDIA (CUDA) on Windows, the Metal GPU on Apple Silicon. It falls back to the CPU only when there is no GPU.
 * **Batch processing**: drop files or whole folders. Each song shows its own status, a broken file doesn't stop the batch, and the next song is separated while the previous one is written to disk.
 * **Output**: MP3 at 320, 256 or 192 kbps, or 24-bit WAV, in one subfolder per song. The stems add back up to the original song exactly.
-* **Easy to use**: a near-black window with a red accent, the OctoSplitter octopus, a drop area (click it or drop files on it), a queue that shows each song's state and time left, a processing card with the progress and a *Cancel* button, and a status bar with the device in use. When songs are split, the *Extracted Stems* card lets you play the original and each stem on its own channel, with waveform, mute, solo and volume. There is a log with the time of every step, and your settings are remembered. The models download themselves on first use, with progress shown.
+* **Easy to use**: a near-black window with a red accent and the OctoSplitter octopus. Drop songs, tick the stems you want and click **Split Stems**, then play the original and each stem on its own channel, with mute, solo and volume (see [Using it](#using-it)). There is a log with the time of every step, your settings are remembered, and the models download themselves on first use, with progress shown.
 * **Updates itself**: when a new version is published it shows what changed and asks. *Update now* downloads only the files that changed, installs them, checks the new version and restarts; if the check fails, your current version is kept. You can also check by hand on the Settings page.
 * **In your language**: English, Português (Brasil), Español, 中文（简体） or हिन्दी. It follows your system's language and can be changed on the Settings page (the app restarts to switch). The log and the command line stay in English.
 * **Command line** for scripting and batches (`--cli`), and a self-test (`--selftest`) used by CI.
@@ -79,7 +55,7 @@ The apps are built for you by GitHub Actions (free), because a Windows build has
 1. The builds run in the GitHub repository (for a copy of your own, create a **private** repository and push this folder to it).
 2. Open the **Actions** tab → **Build desktop apps** → **Run workflow**.
    *Or* publish a release: set the version in `stemsplitter/__init__.py`, then `git tag v1.0.0 && git push --tags` (the tag must match that version). The release is published when both builds pass, and installed apps are offered the update.
-   (Every push is also linted, built and self-tested, so a broken build shows up right away. Downloads are only kept for manual runs and tags.)
+   (Every push that changes more than the documentation or `tools/` is also linted, built and self-tested, so a broken build shows up right away. Downloads are only kept for manual runs and tags.)
 3. After about 15–25 minutes, download:
    * **Windows:** `StemSplitter-Windows-x64-Setup.exe`, the installer (~1.8 GB, because it includes CUDA). Run it: it installs StemSplitter for your user in `%LOCALAPPDATA%\Programs\StemSplitter` (no administrator rights needed), adds it to the Start menu (and, if you tick it, the desktop) and to *Settings → Apps*, where you can uninstall it. It uses an NVIDIA GPU when the PC has one and falls back to the CPU otherwise. Running a newer installer over an installed copy upgrades it.
    * **Windows, portable:** `StemSplitter-Windows-x64.zip` (~2.1 GB) is the same app without installing: right-click it → **Extract All** (or use 7-Zip) and run `StemSplitter\StemSplitter.exe`. Extract it somewhere with a short path, such as your Downloads folder: Windows' built-in extractor silently skips files whose full path is longer than 260 characters, and the app's deepest file sits ~150 characters inside the zip.
@@ -99,9 +75,23 @@ The apps are built for you by GitHub Actions (free), because a Windows build has
 
 ## Using it
 
-1. Drag songs (or a whole folder) onto the drop area, or click **Add Files** or **Add Folder**.
-2. In **Output Settings**, choose where to save, the quality, the format, and under **Stems to extract** tick the stems you want: Vocals, Drums, Bass, Other (melody), Guitar, Piano (keys), Instrumental (no vocals) and No Drums (the song without drums). Each song gets its own subfolder with one file per ticked stem: `Song - Vocals.mp3`, `Song - Drums.mp3`, `Song - Bass.mp3`, `Song - Other.mp3`, …
-3. Click **Split Stems**. The processing card at the bottom shows the song being split, its progress and the time left, with a **Cancel** button. If some songs fail, click **Split Stems** again to retry only those.
+The screenshots on this page are of OctoSplitter 1.2.0 run from source on Windows 11, splitting one 4:15 MP3 with the *Fast* preset and the default stems.
+
+1. **Add songs.** Drag songs (or a whole folder) onto the drop area, or click **Add Files** or **Add Folder**. Below the drop area are the queue (*Files to process*), the *Extracted Stems* card, which stays empty until a song is split, and **Output Settings**.
+
+   ![The Split page when the app opens: drop area, empty queue, empty Extracted Stems card](docs/images/screen-1-empty.png)
+
+2. **Choose the output.** In **Output Settings**, choose where to save, the quality, the format, and under **Stems to extract** tick the stems you want: Vocals, Drums, Bass, Other (melody), Guitar, Piano (keys), Instrumental (no vocals) and No Drums (the song without drums). Each song gets its own subfolder with one file per ticked stem: `Song - Vocals.mp3`, `Song - Drums.mp3`, `Song - Bass.mp3`, `Song - Other.mp3`, … Until you start, the card at the bottom sums up what will be written, here "1 song to split · 4 files per song · Fast (about 1.8× faster, a little more bleed) · MP3 · 320 kbps".
+
+   ![A song in the queue, ready to be split](docs/images/screen-2-before.png)
+
+3. **Split.** Click **Split Stems**. The song's row shows its progress and the time left, the processing card at the bottom shows the stage and a **Cancel** button, and the status bar shows the device in use and the memory. If some songs fail, click **Split Stems** again to retry only those.
+
+   ![The song being split, with its progress, the time left and the Cancel button](docs/images/screen-3-processing.png)
+
+4. **Listen.** A finished song is marked *Completed* with the time it took, and the **Extracted Stems** card (the screenshot at the top of this page) shows the original and one channel per stem, each with its waveform, play, **M** (mute), **S** (solo) and volume. **Play stems** plays them together, and **Open output folder** shows the files, one subfolder per song.
+
+> In this run the 4:15 song took 41 s (decoding 0.4 s, separation 31.4 s, writing the four MP3s 8.9 s) on the GPU of a laptop with an Intel i5-12500H, 24 GB of RAM and an NVIDIA RTX 3050 Laptop (4 GB), with the model already loaded and 5.7 GB of RAM free. That is a single run, not a benchmark: see [How long does it take?](#how-long-does-it-take-4-minute-song) for the measured timings.
 
 The sidebar has four pages: **Split** (everything above), **Batch** (how the queue handles many songs, with a shortcut to add a folder), **Settings** and **About**.
 
@@ -129,6 +119,7 @@ When you add several songs, the next one is already being separated while the pr
 * Almost all of the time is the AI model itself, so the preset is the real speed knob.
 * On GPUs with little memory (4 GB), close other apps that use the GPU (games, video editors, a second copy of OctoSplitter). When the GPU runs out of memory Windows borrows system RAM and the split can get several times slower.
 * The app shows which device it is using in the status bar at the bottom of the window, and the log lists how long each step took.
+* If the status bar says "CPU · … (no GPU found - this will be slow)" on a PC with an NVIDIA GPU, PyTorch can't use the GPU. Update the NVIDIA driver (the Windows build uses CUDA 13.0), check that you downloaded the regular Windows build and not the CPU-only one, and, when running from source, install the CUDA build of PyTorch (see [Running from source](#running-from-source-developers)).
 * `STEMSPLITTER_THREADS` (environment variable) pins the CPU thread count. On the test laptop the default was already the fastest, so only try it if CPU-only runs look slow.
 
 **Memory.** By default the window runs with *Ignore the memory limit* ticked (Settings page): it uses all the memory it wants and never waits for free memory, so the computer can slow down or swap and the system may end the app if memory runs out. No work is lost: every song keeps a checkpoint, so a cancelled or crashed split continues where it stopped. Untick it to protect the rest of the computer: StemSplitter then always leaves a reserve free (*Keep free for the system*: automatic, 2 GB on most machines, or 1–8 GB), uses what is left to go fast, and slows down or waits when other programs need the memory, showing "Waiting for free memory…". The CLI keeps the limit unless you pass `--no-memory-limit`. The window itself uses about 83 MB (measured on Windows 11); the AI models run in a separate worker process that quits 30 seconds after the queue is done and gives all of its memory back. Set `STEMSPLITTER_MEMLOG=1` to log the memory use of each step.
@@ -187,8 +178,11 @@ installer/StemSplitter.iss      Windows installer (Inno Setup)
 ruff.toml                       lint rules (real errors only)
 CLAUDE.md                       project rules for Claude Code (English only; document every relevant change)
 docs/DOCUMENTATION.md           full technical documentation
+docs/images/                    the README screenshots (retake them when the Split page changes), the logo's source
+                                and a design illustration (interface.png, not a screenshot)
 tests/                          regression tests (engine with a fake network; updater; translations)
 tools/make_icon.py              generates the icons in assets/
+tools/release.py                starts a release: bumps the version, commits, tags and pushes
 ```
 
 ## Limitations
