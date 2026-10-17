@@ -12,6 +12,8 @@ The technical history (commits, measurements) is in [section 9 of the documentat
 
 ## Unreleased
 
+## 1.2.3 (2026-10-17)
+
 - The update pop-up now says exactly what each new version adds or changes, in plain words, instead of a list of technical changes.
 - Nothing else in the app changed.
 
