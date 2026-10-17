@@ -59,7 +59,7 @@ jobs:
         # --notes is put before the generated notes: which file to download, for the people on the release page
         run: |
           gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1 || \
-            gh release create "$GITHUB_REF_NAME" --draft --generate-notes --title "StemSplitter ${GITHUB_REF_NAME#v}" \
+            gh release create "$GITHUB_REF_NAME" --draft --generate-notes --title "OctoSplitter ${GITHUB_REF_NAME#v}" \
               --notes "**Download:** Windows: \`StemSplitter-Windows-x64-Setup.exe\` (run it to install). Mac: \`StemSplitter-macOS-AppleSilicon.zip\`. The other files are a portable Windows zip and the lists the app uses to update itself."
 
   build:

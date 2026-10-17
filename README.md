@@ -1,6 +1,6 @@
 # OctoSplitter
 
-> OctoSplitter was called StemSplitter until this version. Only the name shown in the app and its look changed: the download file names (`StemSplitter-…`), the install folder and the settings keep the old name, so existing installs update normally.
+> OctoSplitter was called StemSplitter before version 1.2.0. The app and this repository (now `Pablokaer/OctoSplitter`; links to `Pablokaer/StemSplitter` still lead here) use the new name. The download file names (`StemSplitter-…`), the program (`StemSplitter.exe`, `StemSplitter.app`), the install folder and the settings keep the old name, so existing installs keep their settings and update normally.
 
 ![OctoSplitter after splitting a song: the Extracted Stems card plays the original and each stem on its own channel](docs/images/screen-4-after.png)
 
