@@ -19,6 +19,7 @@ A relevant change is not done until the documentation describes the new state of
 **What to update:**
 - `docs/DOCUMENTATION.md`: the affected section (features, quality, performance, architecture, CI, limitations), and **always** a new row in the section 9 table (change history). A commit cannot quote its own hash: put `—` in the row and fill in the hash the next time the documentation is updated.
 - `README.md`: whenever the change affects people who download, install or use the app (features, timings, requirements, options, limitations, file layout).
+- `CHANGELOG.md`: a line under `## Unreleased` for every change people can notice in the app or its downloads. Say exactly what was added, changed or fixed, in plain words for users, not commit titles. These lines become the version's release notes, which the update dialog shows; `tools/release.py` refuses to release while Unreleased is empty (a version with no change to the app says so).
 - The docstrings and comments that describe the changed behavior.
 - Remove or fix whatever is no longer true. The documentation describes the **current** state and does not keep old versions, except in the history.
 

@@ -46,9 +46,15 @@ jobs:
         run: python -m unittest discover -s tests -p test_updater.py -v
       - name: Language tests (every text translated, same placeholders)
         run: python -m unittest discover -s tests -p test_i18n.py -v
+      - name: Changelog tests (the current version has its release notes in CHANGELOG.md)
+        run: python -m unittest discover -s tests -p test_changelog.py -v
       - name: Check the tag matches the app version (tags only)
         if: startsWith(github.ref, 'refs/tags/')
         run: python -m stemsplitter.release check-version "$GITHUB_REF_NAME"
+      - name: Release notes from CHANGELOG.md (tags only)
+        # exactly what this version adds or changes, as written in its section; fails when there is none
+        if: startsWith(github.ref, 'refs/tags/')
+        run: python -m stemsplitter.release notes "$GITHUB_REF_NAME" -o release-notes.md
       - name: Create the draft release (tags only)
         # a draft is invisible to the apps' update check until the publish job below makes it public,
         # so nobody is offered a release whose files for their platform are still being built
@@ -56,11 +62,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        # --notes is put before the generated notes: which file to download, for the people on the release page
+        # the notes are what the update dialog shows: which file to download, then the version's CHANGELOG.md section
         run: |
           gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1 || \
-            gh release create "$GITHUB_REF_NAME" --draft --generate-notes --title "OctoSplitter ${GITHUB_REF_NAME#v}" \
-              --notes "**Download:** Windows: \`StemSplitter-Windows-x64-Setup.exe\` (run it to install). Mac: \`StemSplitter-macOS-AppleSilicon.zip\`. The other files are a portable Windows zip and the lists the app uses to update itself."
+            gh release create "$GITHUB_REF_NAME" --draft --title "OctoSplitter ${GITHUB_REF_NAME#v}" \
+              --notes-file release-notes.md
 
   build:
     needs: lint

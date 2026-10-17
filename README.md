@@ -54,7 +54,7 @@ The apps are built for you by GitHub Actions (free), because a Windows build has
 
 1. The builds run in the GitHub repository (for a copy of your own, create a **private** repository and push this folder to it).
 2. Open the **Actions** tab → **Build desktop apps** → **Run workflow**.
-   *Or* publish a release: set the version in `stemsplitter/__init__.py`, then `git tag v1.0.0 && git push --tags` (the tag must match that version). The release is published when both builds pass, and installed apps are offered the update.
+   *Or* publish a release: write what the version adds or changes under *Unreleased* in [CHANGELOG.md](CHANGELOG.md), then run `python tools/release.py patch` (or `minor`, `major`, or a version), which sets the version, commits, tags and pushes. The release is published when both builds pass, with that CHANGELOG section as its notes, and installed apps are offered the update.
    (Every push that changes more than the documentation or `tools/` is also linted, built and self-tested, so a broken build shows up right away. Downloads are only kept for manual runs and tags.)
 3. After about 15–25 minutes, download:
    * **Windows:** `StemSplitter-Windows-x64-Setup.exe`, the installer (~1.8 GB, because it includes CUDA). Run it: it installs StemSplitter for your user in `%LOCALAPPDATA%\Programs\StemSplitter` (no administrator rights needed), adds it to the Start menu (and, if you tick it, the desktop) and to *Settings → Apps*, where you can uninstall it. It uses an NVIDIA GPU when the PC has one and falls back to the CPU otherwise. Running a newer installer over an installed copy upgrades it.
@@ -129,7 +129,7 @@ You can close the window and it asks before stopping a job that is still running
 
 ## Updates
 
-When a new version is published on GitHub, OctoSplitter tells you when it starts (untick *Check for updates when the app starts* on the Settings page to turn this off, and use *Check for updates* there whenever you like). The pop-up shows what's new and offers *Update now*, *Later* or *Skip this version*.
+When a new version is published on GitHub, OctoSplitter tells you when it starts (untick *Check for updates when the app starts* on the Settings page to turn this off, and use *Check for updates* there whenever you like). The pop-up shows exactly what the new version adds or changes (its section of [CHANGELOG.md](CHANGELOG.md)) and offers *Update now*, *Later* or *Skip this version*.
 
 *Update now* downloads only the files that changed. OctoSplitter then closes, a small window installs the update and checks the new version, and the app opens again. If anything fails, your current version is kept and the app tells you why. For this to work, the app's folder and the folder containing it must be writable. The installer already puts it in such a folder; with the portable zip, keep the app in a folder of your own (Downloads, Desktop, Documents…), not in `C:\Program Files`. While it updates, it uses a `.ss-update` folder next to the app and removes it afterwards.
 
@@ -169,7 +169,8 @@ stemsplitter/memgov.py          memory governor: keeps the app below what the sy
 stemsplitter/memory.py          memory logging (STEMSPLITTER_MEMLOG=1)
 stemsplitter/platform_utils.py  app folders, bundled ffmpeg, Windows/macOS quirks
 stemsplitter/updater.py         self-update: release check, changed files, range downloads, install, rollback
-stemsplitter/release.py         release tools for CI (file index, archive check, tag/version check)
+stemsplitter/release.py         release tools for CI (file index, archive check, tag/version check, release notes)
+stemsplitter/changelog.py       reads CHANGELOG.md: each version's release notes
 stemsplitter/i18n.py            interface languages (tr(), language list, system language)
 stemsplitter/locales/           one translation catalog per language
 StemSplitter.spec               PyInstaller build recipe
@@ -183,6 +184,7 @@ docs/images/                    the README screenshots (retake them when the Spl
 tests/                          regression tests (engine with a fake network; updater; translations)
 tools/make_icon.py              generates the icons in assets/
 tools/release.py                starts a release: bumps the version, commits, tags and pushes
+CHANGELOG.md                    what each version adds or changes (its release notes)
 ```
 
 ## Limitations
