@@ -6,10 +6,12 @@ on:
     tags: ["v*"]          # push a tag like v1.0.0 -> builds + GitHub Release with the downloads
     paths-ignore:         # (not applied to tags) docs-only commits can't break the build
       - "**.md"
+      - "docs/**"         # the documentation's screenshots and images
       - "tools/**"
   pull_request:           # only builds PRs from forks; same-repo branches are already built on push
     paths-ignore:
       - "**.md"
+      - "docs/**"
       - "tools/**"
   workflow_dispatch:      # or run it by hand from the Actions tab
     inputs:
