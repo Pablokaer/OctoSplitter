@@ -1,15 +1,19 @@
 """Start a release: bump the version, commit it, tag it and push (the tag makes CI build and publish).
 
+The notes under `## Unreleased` in CHANGELOG.md become the new version's section in the same commit; CI
+publishes them as the release notes, which the app's update dialog shows. Write them first.
+
     python tools/release.py 1.2.0        # an explicit version
     python tools/release.py patch        # 1.1.2 -> 1.1.3   (also: minor, major)
     python tools/release.py minor --dry-run
 
-It refuses to run unless you are on `main`, the working tree is clean, `main` matches `origin/main`
-and the tag doesn't exist yet. Standard library only.
+It refuses to run unless you are on `main`, the working tree is clean, `main` matches `origin/main`,
+the tag doesn't exist yet and CHANGELOG.md has notes under `## Unreleased`. Standard library only.
 """
 from __future__ import annotations
 
 import argparse
+import datetime
 import re
 import subprocess
 import sys
@@ -17,6 +21,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 INIT = ROOT / "stemsplitter" / "__init__.py"
+sys.path.insert(0, str(ROOT))
+from stemsplitter import changelog  # noqa: E402  (standard library only)
 VERSION_RE = re.compile(r'^__version__ = "(\d+)\.(\d+)\.(\d+)"$', re.M)
 
 
@@ -64,17 +70,24 @@ def main() -> None:
         sys.exit("main differs from origin/main: pull (or push) first")
     if git("tag", "--list", tag):
         sys.exit(f"the tag {tag} already exists")
+    notes_text = changelog.PATH.read_text(encoding="utf-8")
+    try:
+        notes_text = changelog.release_unreleased(notes_text, version, datetime.date.today().isoformat())
+    except ValueError as exc:
+        sys.exit(str(exc))
 
     print(f"{match.group(0)}  ->  __version__ = \"{version}\"; tag {tag}")
+    print(f"release notes (CHANGELOG.md, Unreleased -> {version}):\n{changelog.notes_for(notes_text, version)}")
     if args.dry_run:
         print("dry run: nothing changed")
         return
     INIT.write_text(VERSION_RE.sub(f'__version__ = "{version}"', text, count=1), encoding="utf-8")
-    git("add", str(INIT))
+    changelog.PATH.write_text(notes_text, encoding="utf-8")
+    git("add", str(INIT), str(changelog.PATH))
     git("commit", "-m", f"release: version {version}")
     git("tag", tag)
     git("push", "origin", "main", tag)
-    print(f"pushed {tag}: CI now builds it and publishes the release (edit its notes on GitHub).")
+    print(f"pushed {tag}: CI now builds it and publishes the release with these notes.")
 
 
 if __name__ == "__main__":

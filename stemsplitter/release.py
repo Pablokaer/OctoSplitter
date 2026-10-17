@@ -1,13 +1,15 @@
 """Release tools for CI (standard library only).
 
     python -m stemsplitter.release check-version v1.2.0
+    python -m stemsplitter.release notes v1.2.0 -o release-notes.md
     python -m stemsplitter.release index dist/StemSplitter --platform Windows-x64 -o release/
     python -m stemsplitter.release verify release/StemSplitter-Windows-x64.files.json --into verify/
 
 `index` writes the build's file index next to the release archive. `verify` checks the archive with the same
 code the app updates itself with: it installs the whole build from the archive into an empty folder, then
 damages that copy (a file deleted, one changed, a stray file added) and updates it again; after each step
-the copy must match the index exactly. CI then runs `--selftest` on the copy.
+the copy must match the index exactly. CI then runs `--selftest` on the copy. `notes` writes the release notes:
+which file to download, then the version's section of CHANGELOG.md (it fails when there is none).
 """
 
 from __future__ import annotations
@@ -19,8 +21,13 @@ import sys
 import time
 from pathlib import Path
 
-from . import __version__
+from . import __version__, changelog
 from . import updater as U
+
+# first line of every release's notes, for the people on the release page
+DOWNLOAD = ("**Download:** Windows: `StemSplitter-Windows-x64-Setup.exe` (run it to install). Mac: "
+            "`StemSplitter-macOS-AppleSilicon.zip`. The other files are a portable Windows zip and the lists the "
+            "app uses to update itself.")
 
 
 def check_version(tag: str) -> int:
@@ -28,6 +35,22 @@ def check_version(tag: str) -> int:
         print(f"::error::The tag {tag} doesn't match the app version {__version__} (stemsplitter/__init__.py)")
         return 1
     print(f"tag {tag} matches the app version {__version__}")
+    return 0
+
+
+def write_notes(tag: str, out: Path | None) -> int:
+    try:
+        body = changelog.notes_for(changelog.PATH.read_text(encoding="utf-8"), tag)
+    except (OSError, ValueError) as exc:
+        print(f"::error::{exc}")
+        return 1
+    notes = f"{DOWNLOAD}\n\n{body}\n"
+    if out is None:
+        sys.stdout.flush()
+        sys.stdout.buffer.write(notes.encode("utf-8"))  # UTF-8 whatever the console's code page
+    else:
+        out.write_text(notes, encoding="utf-8")
+        print(f"release notes for {tag} written to {out}:\n{notes}")
     return 0
 
 
@@ -94,6 +117,9 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("check-version", help="fail unless the tag (vX.Y.Z) matches __version__")
     p.add_argument("tag")
+    p = sub.add_parser("notes", help="write the release notes of a version from CHANGELOG.md (fails without them)")
+    p.add_argument("tag")
+    p.add_argument("-o", "--out", type=Path, help="file to write (default: print them)")
     p = sub.add_parser("index", help="write <out>/StemSplitter-<platform>.files.json for a build folder")
     p.add_argument("root", type=Path, help="dist/StemSplitter or dist/StemSplitter.app")
     p.add_argument("--platform", required=True)
@@ -104,6 +130,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.cmd == "check-version":
         return check_version(args.tag)
+    if args.cmd == "notes":
+        return write_notes(args.tag, args.out)
     if args.cmd == "index":
         return write_index(args.root, args.platform, args.out)
     return verify(args.index, args.into)
